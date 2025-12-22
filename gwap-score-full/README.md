@@ -1,3 +1,7 @@
+<p align="center">
+  <img src="../assets/brand/logo.png" alt="GwapScore Logo" width="200" />
+</p>
+
 # GwapScore Trust Protocol v1.0
 
 GwapScore is a **trust protocol**, not an app. It derives explainable reputation from verifiable claims, behavioral events, and signed attestations — without storing mutable scores or deleting history.

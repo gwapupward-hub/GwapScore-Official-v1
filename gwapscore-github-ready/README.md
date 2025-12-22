@@ -1,3 +1,7 @@
+<p align="center">
+  <img src="../assets/brand/logo.png" alt="GwapScore Logo" width="200" />
+</p>
+
 # GWAP Score
 
 Trust Infrastructure Protocol v1.0
