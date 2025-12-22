@@ -13,7 +13,7 @@ export const apiLimiter = rateLimit({
   message: new RateLimitError().toJSON(),
   standardHeaders: true,
   legacyHeaders: false,
-  handler: (req, res) => {
+  handler: (_req, res) => {
     const error = new RateLimitError();
     res.status(error.statusCode).json(error.toJSON());
   },
@@ -28,7 +28,7 @@ export const writeLimiter = rateLimit({
   message: new RateLimitError().toJSON(),
   standardHeaders: true,
   legacyHeaders: false,
-  handler: (req, res) => {
+  handler: (_req, res) => {
     const error = new RateLimitError();
     res.status(error.statusCode).json(error.toJSON());
   },
@@ -43,7 +43,7 @@ export const strictLimiter = rateLimit({
   message: new RateLimitError().toJSON(),
   standardHeaders: true,
   legacyHeaders: false,
-  handler: (req, res) => {
+  handler: (_req, res) => {
     const error = new RateLimitError();
     res.status(error.statusCode).json(error.toJSON());
   },

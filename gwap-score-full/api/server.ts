@@ -35,7 +35,7 @@ app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 app.use(apiLimiter);
 
 // Request logging middleware
-app.use((req, res, next) => {
+app.use((req, _res, next) => {
   logger.info('Incoming request', {
     method: req.method,
     path: req.path,
@@ -51,7 +51,7 @@ app.use('/v1/adapters', adaptersRouter);
 app.use('/v1/system', systemRouter);
 
 // Root endpoint
-app.get('/', (req, res) => {
+app.get('/', (_req, res) => {
   res.json({
     name: 'GwapScore Trust Protocol API',
     version: '1.0.0',

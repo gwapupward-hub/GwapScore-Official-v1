@@ -52,7 +52,7 @@ export type ScoringResult = {
  * Score is calculated, not stored - ensuring explainability and immutability
  */
 export function deriveScore(profile: TrustProfile): ScoringResult {
-  let score = SCORING_CONSTANTS.BASE_SCORE;
+  let score: number = SCORING_CONSTANTS.BASE_SCORE;
   const explanation = {
     base_score: SCORING_CONSTANTS.BASE_SCORE,
     contributing_claims: [] as string[],

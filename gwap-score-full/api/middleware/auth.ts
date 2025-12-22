@@ -134,7 +134,7 @@ export function requirePermission(permission: string) {
  * Middleware for public endpoints (no auth required)
  * Logs the request for monitoring
  */
-export function publicEndpoint(req: Request, res: Response, next: NextFunction): void {
+export function publicEndpoint(req: Request, _res: Response, next: NextFunction): void {
   logger.debug('Public endpoint accessed', {
     path: req.path,
     method: req.method,

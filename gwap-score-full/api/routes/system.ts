@@ -9,7 +9,7 @@ const router = Router();
  * GET /system/health
  * Health check endpoint
  */
-router.get('/health', publicEndpoint, async (req, res) => {
+router.get('/health', publicEndpoint, async (_req, res) => {
   const dbHealthy = await healthCheck();
 
   const status = dbHealthy ? 'healthy' : 'unhealthy';
@@ -29,7 +29,7 @@ router.get('/health', publicEndpoint, async (req, res) => {
  * GET /system/version
  * API version information
  */
-router.get('/version', publicEndpoint, (req, res) => {
+router.get('/version', publicEndpoint, (_req, res) => {
   res.json({
     version: '1.0.0',
     protocol_version: '1.0',
@@ -41,7 +41,7 @@ router.get('/version', publicEndpoint, (req, res) => {
  * GET /system/scoring-algorithm
  * Get documentation about the scoring algorithm
  */
-router.get('/scoring-algorithm', publicEndpoint, (req, res) => {
+router.get('/scoring-algorithm', publicEndpoint, (_req, res) => {
   res.json({
     description: getScoringAlgorithmDescription(),
     version: '1.0',

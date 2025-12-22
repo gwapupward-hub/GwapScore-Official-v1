@@ -75,9 +75,9 @@ describe('Trust Score Derivation', () => {
     expect(result.score).toBe(
       SCORING_CONSTANTS.BASE_SCORE + SCORING_CONSTANTS.ESTABLISHED_WALLET_SCORE
     );
-    expect(result.explanation.contributing_claims).toContain(
-      expect.stringContaining('Established Solana wallet')
-    );
+    expect(result.explanation.contributing_claims.some(claim =>
+      claim.includes('Established Solana wallet')
+    )).toBe(true);
   });
 
   test('should add points for high activity wallet', () => {
@@ -165,7 +165,9 @@ describe('Trust Score Derivation', () => {
     expect(result.score).toBe(
       SCORING_CONSTANTS.BASE_SCORE - SCORING_CONSTANTS.POLICY_VIOLATION_PENALTY
     );
-    expect(result.explanation.penalties_applied).toContain(expect.stringContaining('Spam detected'));
+    expect(result.explanation.penalties_applied.some(penalty =>
+      penalty.includes('Spam detected')
+    )).toBe(true);
   });
 
   test('should apply attestation multiplier', () => {

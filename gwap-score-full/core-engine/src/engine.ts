@@ -368,7 +368,7 @@ export async function getTrustedIssuer(issuer_id: string): Promise<TrustedIssuer
       'SELECT * FROM trusted_issuers WHERE issuer_id = $1',
       [issuer_id]
     );
-    return result.rowCount > 0 ? result.rows[0] : null;
+    return (result.rowCount ?? 0) > 0 ? result.rows[0] : null;
   } catch (error) {
     logger.error('Failed to get trusted issuer', { issuer_id, error });
     return null;
