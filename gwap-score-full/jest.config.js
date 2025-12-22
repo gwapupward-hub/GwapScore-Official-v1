@@ -3,6 +3,7 @@ export default {
   testEnvironment: 'node',
   roots: ['<rootDir>'],
   testMatch: ['**/__tests__/**/*.ts', '**/?(*.)+(spec|test).ts'],
+  testPathIgnorePatterns: ['/node_modules/', '/dist/'],
   transform: {
     '^.+\\.ts$': ['ts-jest', {
       useESM: true,

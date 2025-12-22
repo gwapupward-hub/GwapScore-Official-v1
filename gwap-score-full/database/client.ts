@@ -65,7 +65,7 @@ export async function closeDatabase(): Promise<void> {
   }
 }
 
-export async function query<T>(
+export async function query<T extends pg.QueryResultRow = pg.QueryResultRow>(
   text: string,
   params?: unknown[]
 ): Promise<pg.QueryResult<T>> {

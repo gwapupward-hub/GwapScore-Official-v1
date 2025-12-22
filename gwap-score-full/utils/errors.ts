@@ -45,13 +45,16 @@ export class AppError extends Error {
   }
 
   toJSON(): Record<string, unknown> {
-    return {
-      error: {
-        code: this.code,
-        message: this.message,
-        ...(this.details && { details: this.details }),
-      },
+    const error: Record<string, unknown> = {
+      code: this.code,
+      message: this.message,
     };
+
+    if (this.details) {
+      error.details = this.details;
+    }
+
+    return { error };
   }
 }
 
