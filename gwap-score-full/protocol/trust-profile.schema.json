@@ -1,0 +1,13 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "TrustProfile",
+  "type": "object",
+  "required": ["subject_id","created_at","claims","events","attestations"],
+  "properties": {
+    "subject_id": { "type": "string" },
+    "created_at": { "type": "string", "format": "date-time" },
+    "claims": { "type": "array" },
+    "events": { "type": "array" },
+    "attestations": { "type": "array" }
+  }
+}

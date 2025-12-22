@@ -1,0 +1,5 @@
+- No delete functions
+- No mutable scores
+- No hidden weighting
+- No adapter-owned state
+- Explainability required
