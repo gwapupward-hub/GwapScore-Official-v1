@@ -1,13 +1,192 @@
 {
   "$schema": "http://json-schema.org/draft-07/schema#",
   "title": "TrustProfile",
+  "description": "A trust profile containing append-only claims, events, and attestations",
   "type": "object",
-  "required": ["subject_id","created_at","claims","events","attestations"],
+  "required": ["subject_id", "created_at", "claims", "events", "attestations"],
   "properties": {
-    "subject_id": { "type": "string" },
-    "created_at": { "type": "string", "format": "date-time" },
-    "claims": { "type": "array" },
-    "events": { "type": "array" },
-    "attestations": { "type": "array" }
+    "subject_id": {
+      "type": "string",
+      "description": "Unique identifier for the subject (wallet address, user ID, etc.)",
+      "minLength": 1,
+      "maxLength": 255
+    },
+    "created_at": {
+      "type": "string",
+      "format": "date-time",
+      "description": "ISO 8601 timestamp when the profile was created"
+    },
+    "updated_at": {
+      "type": "string",
+      "format": "date-time",
+      "description": "ISO 8601 timestamp when the profile was last updated"
+    },
+    "claims": {
+      "type": "array",
+      "description": "Append-only list of verifiable claims",
+      "items": {
+        "$ref": "#/definitions/Claim"
+      }
+    },
+    "events": {
+      "type": "array",
+      "description": "Append-only list of behavioral events",
+      "items": {
+        "$ref": "#/definitions/Event"
+      }
+    },
+    "attestations": {
+      "type": "array",
+      "description": "Append-only list of signed attestations from trusted issuers",
+      "items": {
+        "$ref": "#/definitions/Attestation"
+      }
+    }
+  },
+  "definitions": {
+    "Claim": {
+      "type": "object",
+      "description": "A verifiable claim about the subject",
+      "required": ["claim_id", "type", "value", "source", "issued_at"],
+      "properties": {
+        "claim_id": {
+          "type": "string",
+          "format": "uuid",
+          "description": "Unique identifier for this claim"
+        },
+        "type": {
+          "type": "string",
+          "description": "Type of claim (e.g., owns_wallet, telegram_id)",
+          "pattern": "^[a-z_]+$",
+          "minLength": 1,
+          "maxLength": 100
+        },
+        "value": {
+          "type": "string",
+          "description": "Value of the claim",
+          "minLength": 1,
+          "maxLength": 10000
+        },
+        "source": {
+          "type": "string",
+          "description": "Source system that issued this claim",
+          "pattern": "^[a-z_]+$",
+          "minLength": 1,
+          "maxLength": 100
+        },
+        "issued_at": {
+          "type": "string",
+          "format": "date-time",
+          "description": "ISO 8601 timestamp when the claim was issued"
+        },
+        "expires_at": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Optional ISO 8601 timestamp when the claim expires"
+        },
+        "created_at": {
+          "type": "string",
+          "format": "date-time",
+          "description": "ISO 8601 timestamp when the claim was added to the profile"
+        }
+      }
+    },
+    "Event": {
+      "type": "object",
+      "description": "A behavioral event related to the subject",
+      "required": ["event_id", "event_type", "description", "source", "issued_at"],
+      "properties": {
+        "event_id": {
+          "type": "string",
+          "format": "uuid",
+          "description": "Unique identifier for this event"
+        },
+        "event_type": {
+          "type": "string",
+          "description": "Type of event (e.g., positive_interaction, policy_violation)",
+          "pattern": "^[a-z_]+$",
+          "minLength": 1,
+          "maxLength": 100
+        },
+        "description": {
+          "type": "string",
+          "description": "Human-readable description of the event",
+          "minLength": 1,
+          "maxLength": 1000
+        },
+        "source": {
+          "type": "string",
+          "description": "Source system that recorded this event",
+          "pattern": "^[a-z_]+$",
+          "minLength": 1,
+          "maxLength": 100
+        },
+        "issued_at": {
+          "type": "string",
+          "format": "date-time",
+          "description": "ISO 8601 timestamp when the event occurred"
+        },
+        "created_at": {
+          "type": "string",
+          "format": "date-time",
+          "description": "ISO 8601 timestamp when the event was added to the profile"
+        }
+      }
+    },
+    "Attestation": {
+      "type": "object",
+      "description": "A signed attestation from a trusted issuer",
+      "required": ["attestation_id", "issuer_id", "scope", "weight", "issued_at", "signature"],
+      "properties": {
+        "attestation_id": {
+          "type": "string",
+          "format": "uuid",
+          "description": "Unique identifier for this attestation"
+        },
+        "issuer_id": {
+          "type": "string",
+          "description": "Identifier of the trusted issuer",
+          "minLength": 1,
+          "maxLength": 255
+        },
+        "scope": {
+          "type": "string",
+          "description": "Scope of the attestation (what is being attested)",
+          "minLength": 1,
+          "maxLength": 100
+        },
+        "weight": {
+          "type": "number",
+          "description": "Weight/multiplier this attestation contributes to the trust score",
+          "minimum": 0,
+          "maximum": 10
+        },
+        "issued_at": {
+          "type": "string",
+          "format": "date-time",
+          "description": "ISO 8601 timestamp when the attestation was issued"
+        },
+        "expires_at": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Optional ISO 8601 timestamp when the attestation expires"
+        },
+        "signature": {
+          "type": "string",
+          "description": "Base58-encoded Ed25519 signature",
+          "minLength": 1,
+          "maxLength": 1000
+        },
+        "signature_verified": {
+          "type": "boolean",
+          "description": "Whether the signature has been verified"
+        },
+        "created_at": {
+          "type": "string",
+          "format": "date-time",
+          "description": "ISO 8601 timestamp when the attestation was added to the profile"
+        }
+      }
+    }
   }
 }
