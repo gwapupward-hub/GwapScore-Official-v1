@@ -1,0 +1,15 @@
+{
+  "name": "GwapScore",
+  "logo": "/logo.png",
+  "navigation": [
+    { "group": "Overview", "pages": ["introduction", "overview/brand"] },
+    { "group": "Protocol", "pages": ["protocol/protocol-spec"] },
+    { "group": "API", "pages": ["api/overview", "api/endpoints"] },
+    { "group": "Auth", "pages": ["auth/overview"] },
+    { "group": "Webhooks", "pages": ["webhooks/overview"] },
+    { "group": "Scoring", "pages": ["scoring/scoring-v1"] },
+    { "group": "Integrations", "pages": ["integrations/quickstart"] },
+    { "group": "Issuers", "pages": ["issuers/onboarding"] },
+    { "group": "Press", "pages": ["press/index"] }
+  ]
+}
