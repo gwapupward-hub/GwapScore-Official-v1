@@ -2,6 +2,10 @@
 
 GwapScore-Official-v1 is a TypeScript project for calculating and publishing GwapScore (internal project). This repository contains the full implementation, docs, and GitHub-ready packaging.
 
+## Cross-system authority
+
+See [`GWAP-MASTER.md`](GWAP-MASTER.md) before changing product scope or cross-system ownership.
+
 ## Contents
 
 - gwap-score-full/ — Full implementation and source
