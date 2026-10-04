@@ -8,6 +8,14 @@ export const SOCIAL_SCORE_WEIGHTS = {
 
 export type SocialScoreCategory = keyof typeof SOCIAL_SCORE_WEIGHTS;
 
+const FACTOR_LABELS: Record<SocialScoreCategory, string> = {
+  authenticity: 'Authenticity',
+  engagementQuality: 'Engagement Quality',
+  contentSafety: 'Content Safety & Brand Risk',
+  consistency: 'Consistency & Recency',
+  audienceTrust: 'Audience Trust Signals',
+};
+
 export interface SocialMetrics {
   suspiciousGrowthRate?: number;
   engagementAnomalyRate?: number;
@@ -88,7 +96,7 @@ export function gradeSocialReputation(metrics: SocialMetrics): SocialReputationS
       score: subscores[category],
       weight: SOCIAL_SCORE_WEIGHTS[category],
       contribution: Number(((subscores[category] * SOCIAL_SCORE_WEIGHTS[category]) / 100).toFixed(2)),
-      explanation: `${category} contributes ${subscores[category]}% of its ${SOCIAL_SCORE_WEIGHTS[category]}% weight.`,
+      explanation: `${FACTOR_LABELS[category]} contributes ${subscores[category]}% of its ${SOCIAL_SCORE_WEIGHTS[category]}% weight.`,
     }));
 
   const score = Math.round(factors.reduce((total, factor) => total + factor.contribution, 0));
@@ -97,12 +105,12 @@ export function gradeSocialReputation(metrics: SocialMetrics): SocialReputationS
   const topPositiveDrivers = rankedFactors
     .filter((factor) => factor.score > 50)
     .slice(0, 3)
-    .map((factor) => `${factor.category} (${factor.score}/100)`);
+    .map((factor) => `${FACTOR_LABELS[factor.category]} (${factor.score}/100)`);
   const topNegativeDrivers = [...rankedFactors]
     .reverse()
     .filter((factor) => factor.score < 50)
     .slice(0, 3)
-    .map((factor) => `${factor.category} (${factor.score}/100)`);
+    .map((factor) => `${FACTOR_LABELS[factor.category]} (${factor.score}/100)`);
 
   return {
     score,

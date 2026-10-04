@@ -56,7 +56,7 @@ describe('social reputation scoring', () => {
 
     expect(result.score).toBe(100);
     expect(result.explanation.factors.map(({ weight }) => weight)).toEqual([25, 25, 20, 15, 15]);
-    expect(result.explanation.top_positive_drivers).toContain('authenticity (100/100)');
+    expect(result.explanation.top_positive_drivers).toContain('Authenticity (100/100)');
     expect(result.explanation.rationale).toMatch(/five weighted social-content and audience factors/);
   });
 

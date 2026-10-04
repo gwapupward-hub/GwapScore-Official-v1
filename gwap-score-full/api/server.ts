@@ -9,6 +9,7 @@ import { apiLimiter } from './middleware/rateLimiter.js';
 import profilesRouter from './routes/profiles.js';
 import adaptersRouter from './routes/adapters.js';
 import systemRouter from './routes/system.js';
+import socialRouter from './routes/social.js';
 
 // Load environment variables
 dotenv.config();
@@ -49,6 +50,7 @@ app.use((req, _res, next) => {
 app.use('/v1/profiles', profilesRouter);
 app.use('/v1/adapters', adaptersRouter);
 app.use('/v1/system', systemRouter);
+app.use('/v1/social', socialRouter);
 
 // Root endpoint
 app.get('/', (_req, res) => {
