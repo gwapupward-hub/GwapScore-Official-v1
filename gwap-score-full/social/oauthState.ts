@@ -1,4 +1,4 @@
-import { createHmac, randomBytes, timingSafeEqual } from 'node:crypto';
+import { randomBytes, timingSafeEqual, webcrypto } from 'node:crypto';
 
 export interface OAuthStateClaims {
   userId: string;
@@ -9,13 +9,25 @@ export interface OAuthStateClaims {
   scopes: string[];
 }
 
-export function createOAuthState(
+async function signPayload(payload: string, signingKey: string): Promise<Buffer> {
+  const key = await webcrypto.subtle.importKey(
+    'raw',
+    Buffer.from(signingKey, 'utf8'),
+    { name: 'HMAC', hash: 'SHA-256' },
+    false,
+    ['sign']
+  );
+  const signature = await webcrypto.subtle.sign('HMAC', key, Buffer.from(payload, 'utf8'));
+  return Buffer.from(signature);
+}
+
+export async function createOAuthState(
   userId: string,
   consentId: string,
   scopes: string[],
   signingKey: string,
   now = Date.now()
-): string {
+): Promise<string> {
   if (Buffer.byteLength(signingKey) < 32) {
     throw new Error('SOCIAL_OAUTH_STATE_SECRET must be at least 32 bytes');
   }
@@ -28,21 +40,21 @@ export function createOAuthState(
     scopes,
   };
   const payload = Buffer.from(JSON.stringify(claims)).toString('base64url');
-  const signature = createHmac('sha256', signingKey).update(payload).digest('base64url');
+  const signature = (await signPayload(payload, signingKey)).toString('base64url');
   return `${payload}.${signature}`;
 }
 
-export function verifyOAuthState(
+export async function verifyOAuthState(
   state: string,
   signingKey: string,
   now = Date.now()
-): OAuthStateClaims {
+): Promise<OAuthStateClaims> {
   const [payload, signature, extra] = state.split('.');
   if (!payload || !signature || extra || Buffer.byteLength(signingKey) < 32) {
     throw new Error('Invalid OAuth state');
   }
 
-  const expected = createHmac('sha256', signingKey).update(payload).digest();
+  const expected = await signPayload(payload, signingKey);
   let supplied: Buffer;
   try {
     supplied = Buffer.from(signature, 'base64url');

@@ -362,7 +362,7 @@ export class SocialReputationService {
     }
     const consentId = await this.repository.createConsent(userId, platform, scopes, policyVersion);
     try {
-      const state = createOAuthState(
+      const state = await createOAuthState(
         userId,
         consentId,
         scopes,
@@ -381,7 +381,7 @@ export class SocialReputationService {
   async completeOAuth(code: string, state: string): Promise<SocialAccount> {
     let claims: OAuthStateClaims;
     try {
-      claims = verifyOAuthState(
+      claims = await verifyOAuthState(
         state,
         this.stateSigningKey ?? process.env.SOCIAL_OAUTH_STATE_SECRET ?? ''
       );
@@ -403,7 +403,7 @@ export class SocialReputationService {
   async cancelOAuth(state: string): Promise<void> {
     let claims: OAuthStateClaims;
     try {
-      claims = verifyOAuthState(
+      claims = await verifyOAuthState(
         state,
         this.stateSigningKey ?? process.env.SOCIAL_OAUTH_STATE_SECRET ?? ''
       );

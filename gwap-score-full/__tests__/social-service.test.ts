@@ -96,12 +96,12 @@ describe('social reputation service', () => {
     }));
   });
 
-  test('rejects expired or tampered OAuth state', () => {
+  test('rejects expired or tampered OAuth state', async () => {
     const secret = 'state-signing-secret-value-with-32-bytes';
-    const state = createOAuthState('user-1', 'consent-1', ['instagram_business_basic'], secret, 1000);
-    expect(() => verifyOAuthState(state, secret, 1000)).not.toThrow();
-    expect(() => verifyOAuthState(state, secret, 700_000)).toThrow('Expired or invalid OAuth state');
-    expect(() => verifyOAuthState(`${state}tampered`, secret, 1000)).toThrow('Invalid OAuth state');
+    const state = await createOAuthState('user-1', 'consent-1', ['instagram_business_basic'], secret, 1000);
+    await expect(verifyOAuthState(state, secret, 1000)).resolves.toBeDefined();
+    await expect(verifyOAuthState(state, secret, 700_000)).rejects.toThrow('Expired or invalid OAuth state');
+    await expect(verifyOAuthState(`${state}tampered`, secret, 1000)).rejects.toThrow('Invalid OAuth state');
   });
 
   test('authenticates token encryption and rejects modified ciphertext', () => {
