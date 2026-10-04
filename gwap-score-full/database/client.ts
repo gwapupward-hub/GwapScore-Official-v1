@@ -86,8 +86,7 @@ export async function query<T extends pg.QueryResultRow = pg.QueryResultRow>(
   } catch (error) {
     logger.error('Database query error', {
       query: text,
-      params,
-      error,
+      code: error instanceof Error && 'code' in error ? error.code : undefined,
     });
     throw error;
   }
@@ -105,7 +104,9 @@ export async function transaction<T>(
     return result;
   } catch (error) {
     await client.query('ROLLBACK');
-    logger.error('Transaction rolled back', { error });
+    logger.error('Transaction rolled back', {
+      code: error instanceof Error && 'code' in error ? error.code : undefined,
+    });
     throw error;
   } finally {
     client.release();

@@ -9,6 +9,7 @@ export interface AuthenticatedRequest extends Request {
     key_id: string;
     name: string;
     permissions: string[];
+    user_id?: string | null;
   };
 }
 
@@ -33,37 +34,31 @@ export async function authenticateApiKey(
       throw new UnauthorizedError('API key is required');
     }
 
-    // Hash the provided API key
-    const keyHash = await bcrypt.hash(apiKey, 10);
-
-    // Look up the API key in the database
+    // bcrypt hashes are salted, so compare the supplied key with active stored hashes.
     const result = await query<{
       key_id: string;
+      key_hash: string;
       name: string;
       permissions: string[];
+      user_id: string | null;
       expires_at: string | null;
       is_active: boolean;
     }>(
-      `SELECT key_id, name, permissions, expires_at, is_active
+      `SELECT key_id, key_hash, name, permissions, user_id, expires_at, is_active
        FROM api_keys
-       WHERE key_hash = $1`,
-      [keyHash]
+       WHERE is_active = TRUE AND (expires_at IS NULL OR expires_at > NOW())`
     );
 
-    if (result.rowCount === 0) {
+    let keyData: typeof result.rows[number] | undefined;
+    for (const candidate of result.rows) {
+      if (await bcrypt.compare(apiKey, candidate.key_hash)) {
+        keyData = candidate;
+        break;
+      }
+    }
+
+    if (!keyData) {
       throw new UnauthorizedError('Invalid API key');
-    }
-
-    const keyData = result.rows[0];
-
-    // Check if key is active
-    if (!keyData.is_active) {
-      throw new UnauthorizedError('API key is inactive');
-    }
-
-    // Check if key has expired
-    if (keyData.expires_at && new Date(keyData.expires_at) < new Date()) {
-      throw new UnauthorizedError('API key has expired');
     }
 
     // Update last used timestamp
@@ -77,6 +72,7 @@ export async function authenticateApiKey(
       key_id: keyData.key_id,
       name: keyData.name,
       permissions: keyData.permissions,
+      user_id: keyData.user_id,
     };
 
     logger.debug('API key authenticated', {

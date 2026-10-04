@@ -6,6 +6,96 @@
 
 GwapScore is a **trust protocol**, not an app. It derives explainable reputation from verifiable claims, behavioral events, and signed attestations — without storing mutable scores or deleting history.
 
+## Social reputation module
+
+GwapScore's current product scope is **social reputation and social proof-of-control**. The `social/` API module below adds user-consented Instagram account linking, authorized metric ingestion, and an explainable score. The older protocol sections in this README describe existing repository behavior; they do not expand the current scoring scope. GNS owns financial/on-chain identity context, PPV owns commerce facts, and GwapOS owns user-facing orchestration.
+
+This score is social reputation guidance only. It is **not financial advice and is not credit scoring**. It must not be used as a proxy for ability to repay, lending eligibility, or financial risk.
+
+### Pipeline
+
+```text
+User + explicit consent
+   → authenticated connect request
+   → Instagram OAuth (signed, expiring state)
+   → encrypted access token
+   → manual/internal ingestion job
+   → profile + post metric snapshots
+   → deterministic social score + explanation
+   → latest score and history endpoints
+```
+
+The module stores profile identifiers and the authorized profile/post metrics returned by Instagram; it does not store passwords, private messages, contacts, captions, or post text. Each ingestion currently imports up to 50 available posts, and snapshots are refreshed only when ingestion runs. Disconnecting removes the account's token and linked snapshots, jobs, and scores; `DELETE /v1/social/data` removes all social records and consent records for the authenticated user.
+
+### Instagram OAuth setup
+
+Configure an Instagram app with the redirect URI `https://your-host/v1/social/oauth/callback` (use the matching local URL in development), then set these variables in `.env`:
+
+```dotenv
+INSTAGRAM_CLIENT_ID=your_instagram_app_id
+INSTAGRAM_CLIENT_SECRET=your_instagram_app_secret
+INSTAGRAM_REDIRECT_URI=http://localhost:3000/v1/social/oauth/callback
+SOCIAL_OAUTH_STATE_SECRET=<at least 32 random bytes>
+SOCIAL_TOKEN_ENCRYPTION_KEY=<base64-encoded 32 random bytes>
+```
+
+Generate the application secrets with `openssl rand -base64 32`. The callback uses a signed ten-minute OAuth state; stored access tokens are encrypted with AES-256-GCM. Instagram API access and available insights depend on account type, app review, and granted scopes. Only configure platform-approved read scopes. Apply `database/migrations/002_social_reputation.sql` to an existing database; fresh installs can use the updated `database/schema.sql`.
+
+User-scoped endpoints require an API key with `social:manage` permission and a non-null `api_keys.user_id` bound to an existing `trust_profiles.subject_id`. A platform callback is authorized through its signed OAuth state instead of a bearer API key.
+
+### API example
+
+For these examples, export `AUTHORIZATION_HEADER` as the normal Authorization header containing your user-scoped API key.
+
+```bash
+# Start consented Instagram authorization
+curl -X POST http://localhost:3000/v1/social/accounts/connect \
+  -H "$AUTHORIZATION_HEADER" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "platform": "instagram",
+    "accepted": true,
+    "policy_version": "2026-10-04",
+    "scopes": ["instagram_business_basic", "instagram_business_manage_insights"]
+  }'
+
+# List linked accounts
+curl http://localhost:3000/v1/social/accounts \
+  -H "$AUTHORIZATION_HEADER"
+
+# Trigger a metrics ingestion and score update
+curl -X POST "http://localhost:3000/v1/social/accounts/$ACCOUNT_ID/ingest" \
+  -H "$AUTHORIZATION_HEADER"
+
+# Retrieve the latest score/explanation and score history/trend
+curl http://localhost:3000/v1/social/scores/latest \
+  -H "$AUTHORIZATION_HEADER"
+curl "http://localhost:3000/v1/social/scores/history?limit=30" \
+  -H "$AUTHORIZATION_HEADER"
+
+# Disconnect one account or delete all social data
+curl -X DELETE "http://localhost:3000/v1/social/accounts/$ACCOUNT_ID" \
+  -H "$AUTHORIZATION_HEADER"
+curl -X DELETE http://localhost:3000/v1/social/data \
+  -H "$AUTHORIZATION_HEADER"
+```
+
+### Social v1 scoring rubric
+
+Each subscore is normalized to 0–100 and contributes its listed share to the overall 0–100 score:
+
+| Factor | Weight | v1 signals |
+| --- | ---: | --- |
+| Authenticity | 25% | Growth and engagement anomaly signals |
+| Engagement Quality | 25% | Engagement rate and meaningful-comment signals |
+| Content Safety & Brand Risk | 20% | Platform-approved content safety signals |
+| Consistency & Recency | 15% | Recent post cadence and inactivity |
+| Audience Trust Signals | 15% | Repeat-audience and positive-feedback signals |
+
+Grades are A (90–100), B (80–89), C (70–79), D (60–69), and F (0–59). Each response contains the weighted factor contributions, strongest positive/negative drivers, and a concise rationale. Missing metrics are neutral rather than treated as adverse. The initial Instagram adapter currently imports profile/media engagement metrics; growth anomalies, comment quality, content safety, and audience trust need platform-authorized signals or a separately reviewed analysis service and therefore remain neutral until available. These signals do not imply real-world identity or audience authenticity.
+
+Consent copy and policy version are returned by `GET /v1/social/consent` and recorded server-side when connect is initiated. Consent explains collection, exclusions, purpose, and disconnect/deletion rights. Review platform terms and privacy requirements before enabling ingestion for real users.
+
 ## Core Principles
 
 - **Append-only trust profiles** - History is immutable, never deleted

@@ -1,6 +1,6 @@
 # GwapScore
 
-GwapScore-Official-v1 is a TypeScript project for calculating and publishing GwapScore (internal project). This repository contains the full implementation, docs, and GitHub-ready packaging.
+GwapScore-Official-v1 is a TypeScript project for social reputation and social proof-of-control. The repository also contains earlier protocol code and GitHub-ready packaging.
 
 ## Cross-system authority
 
@@ -12,6 +12,9 @@ See [`GWAP-MASTER.md`](GWAP-MASTER.md) before changing product scope or cross-sy
 - gwapscore-docs-publish/ — Generated documentation ready for publishing
 - gwapscore-github-ready/ — Built artifacts prepared for GitHub release
 - assets/ — Project assets (images, icons, etc.)
+- [`gwap-score-full/README.md`](gwap-score-full/README.md) — Backend setup and social reputation API
+
+The current GwapScore product boundary is social reputation. Financial/on-chain identity context belongs to GNS, commerce facts to PPV, and user-facing orchestration to GwapOS, as described in [`GWAP-MASTER.md`](GWAP-MASTER.md).
 
 ## Requirements
 
