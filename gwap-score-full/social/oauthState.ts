@@ -13,10 +13,10 @@ export function createOAuthState(
   userId: string,
   consentId: string,
   scopes: string[],
-  secret: string,
+  signingKey: string,
   now = Date.now()
 ): string {
-  if (Buffer.byteLength(secret) < 32) {
+  if (Buffer.byteLength(signingKey) < 32) {
     throw new Error('SOCIAL_OAUTH_STATE_SECRET must be at least 32 bytes');
   }
   const claims: OAuthStateClaims = {
@@ -28,21 +28,21 @@ export function createOAuthState(
     scopes,
   };
   const payload = Buffer.from(JSON.stringify(claims)).toString('base64url');
-  const signature = createHmac('sha256', secret).update(payload).digest('base64url');
+  const signature = createHmac('sha256', signingKey).update(payload).digest('base64url');
   return `${payload}.${signature}`;
 }
 
 export function verifyOAuthState(
   state: string,
-  secret: string,
+  signingKey: string,
   now = Date.now()
 ): OAuthStateClaims {
   const [payload, signature, extra] = state.split('.');
-  if (!payload || !signature || extra || Buffer.byteLength(secret) < 32) {
+  if (!payload || !signature || extra || Buffer.byteLength(signingKey) < 32) {
     throw new Error('Invalid OAuth state');
   }
 
-  const expected = createHmac('sha256', secret).update(payload).digest();
+  const expected = createHmac('sha256', signingKey).update(payload).digest();
   let supplied: Buffer;
   try {
     supplied = Buffer.from(signature, 'base64url');

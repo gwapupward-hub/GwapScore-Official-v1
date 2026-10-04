@@ -345,7 +345,7 @@ export class SocialReputationService {
   constructor(
     private readonly repository: SocialRepository,
     private readonly provider: SocialProvider,
-    private readonly stateSecret?: string,
+    private readonly stateSigningKey?: string,
     private readonly tokenKey?: string
   ) {}
 
@@ -366,7 +366,7 @@ export class SocialReputationService {
         userId,
         consentId,
         scopes,
-        this.stateSecret ?? process.env.SOCIAL_OAUTH_STATE_SECRET ?? ''
+        this.stateSigningKey ?? process.env.SOCIAL_OAUTH_STATE_SECRET ?? ''
       );
       return {
         authorizationUrl: this.provider.authorizationUrl(state, scopes),
@@ -383,7 +383,7 @@ export class SocialReputationService {
     try {
       claims = verifyOAuthState(
         state,
-        this.stateSecret ?? process.env.SOCIAL_OAUTH_STATE_SECRET ?? ''
+        this.stateSigningKey ?? process.env.SOCIAL_OAUTH_STATE_SECRET ?? ''
       );
     } catch {
       throw new ValidationError('Invalid or expired OAuth state');
@@ -405,7 +405,7 @@ export class SocialReputationService {
     try {
       claims = verifyOAuthState(
         state,
-        this.stateSecret ?? process.env.SOCIAL_OAUTH_STATE_SECRET ?? ''
+        this.stateSigningKey ?? process.env.SOCIAL_OAUTH_STATE_SECRET ?? ''
       );
     } catch {
       throw new ValidationError('Invalid or expired OAuth state');
