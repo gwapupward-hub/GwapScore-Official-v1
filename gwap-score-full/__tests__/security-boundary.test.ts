@@ -57,6 +57,10 @@ describe('GwapScore v2 evidence security boundaries', () => {
 
     expect(withMissingWallet.dimensions.wallet.state).toBe('unavailable');
     expect(withMissingWallet.composite100).toBeGreaterThan(80);
-    expect(withMissingWallet.unavailableEvidence).toContain('wallet');
+    expect(withMissingWallet.unavailableEvidence).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({ dimension: 'wallet', reason: 'Not linked.' }),
+      ])
+    );
   });
 });
