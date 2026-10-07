@@ -1,6 +1,18 @@
 {
   "name": "GwapScore",
-  "logo": "/logo.png",
+  "logo": {
+    "dark": "/logo.svg",
+    "light": "/logo.svg"
+  },
+  "favicon": "/favicon.ico",
+  "colors": {
+    "primary": "#13DD13",
+    "light": "#13DD13",
+    "dark": "#0FA80F",
+    "background": {
+      "dark": "#000000"
+    }
+  },
   "navigation": [
     { "group": "Overview", "pages": ["introduction", "overview/brand"] },
     { "group": "Protocol", "pages": ["protocol/protocol-spec"] },
