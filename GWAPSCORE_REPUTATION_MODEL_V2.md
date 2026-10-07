@@ -56,54 +56,68 @@ Eligible evidence includes:
 
 Social remains the primary product surface.
 
+The implemented alpha social scorer uses explicit `observed` / `unavailable` evidence states. Missing or non-finite metrics are excluded, available evidence is re-normalized, and evidence coverage is reported separately. Historical rows created under the older neutral-imputation policy are not eligible for v2 composition until re-ingested.
+
 ### 2. Wallet Reputation
 
 Candidate base weight: **30%**
 
 Wallet Reputation consumes **reputation-eligible Wallet Intelligence evidence**, not portfolio risk.
 
-Eligible candidate evidence includes:
+Current alpha evidence includes:
 
-- cryptographically verified wallet control;
+- verified wallet control;
 - wallet longevity;
-- transaction-history depth;
-- sustained rather than burst-only activity;
-- protocol participation history;
-- behavioral continuity;
-- successful verified on-chain interactions;
-- approved PPV/GWAP facts when routed to the appropriate dimension;
-- other deterministic wallet-history facts approved by model policy.
+- transaction-history depth.
+
+Future approved evidence may include sustained activity, protocol participation, behavioral continuity, and other deterministic wallet-history facts.
 
 A wallet's balance, token value, or apparent wealth must not automatically create reputation.
+
+#### Wallet evidence trust boundary
+
+V2 does not consume arbitrary generic claims as Wallet Intelligence.
+
+The privileged Solana adapter stores eligible evidence in `wallet_intelligence_snapshots`. Generic profile claims remain for backwards compatibility but are not authoritative v2 wallet-score inputs.
+
+Wallet control is a hard gate. A snapshot with `ownership_verified = false` contributes no Wallet Reputation.
+
+#### Current alpha wallet submodel
+
+- wallet longevity: 45% of Wallet Reputation;
+- transaction activity: 55% of Wallet Reputation.
+
+Longevity reaches the current alpha maximum at two years of observed wallet history.
+
+Transaction activity preserves transparent legacy anchors:
+
+- 0 transactions → 0 activity score;
+- 100 transactions → 50 activity score;
+- 1,000+ transactions → 100 activity score;
+- intermediate values interpolate deterministically.
+
+These are calibration candidates, not permanent protocol law.
 
 ### 3. Identity / Proof
 
 Candidate base weight: **15%**
 
-Eligible evidence includes:
+The current alpha implementation recognizes two supported proof classes:
 
-- verified `.gwap` identity relationships;
-- verified wallet control;
-- verified social proof-of-control;
-- approved identity attestations;
-- evidence freshness and continuity.
+- connected social OAuth/proof-of-control;
+- verified wallet control from an eligible Wallet Intelligence snapshot.
 
-Identity verification establishes confidence in the subject/evidence relationship. It is not equivalent to good reputation by itself.
+Observed proof classes score as valid proof while missing proof classes reduce confidence rather than inventing a negative reputation value.
+
+Future proof classes may include verified `.gwap` relationships and approved identity attestations.
 
 ### 4. GWAP Ecosystem Reputation
 
 Candidate base weight: **10%**
 
-Eligible evidence may include:
+This dimension is reserved for trusted GWAP-native evidence such as approved PPV/GWAP facts.
 
-- verified PPV factual receipts;
-- completed GWAP ecosystem interactions;
-- accepted deliverables;
-- settled/completed reputation-relevant events;
-- verified contribution history;
-- other Founder-approved ecosystem facts.
-
-PPV records facts. GwapScore interprets approved facts downstream.
+It is currently returned as unavailable by the executable alpha composition service. Generic user-submitted events must not silently become ecosystem reputation.
 
 ## Candidate base weights
 
@@ -253,16 +267,11 @@ These may appear beside GwapScore in an intelligence product, but they do not be
 
 ## Wallet-linking policy
 
-A wallet must be cryptographically proven as controlled by the score subject before it contributes.
+A wallet must be proven as controlled by the score subject before it contributes.
 
-Initial v2 policy should use one explicitly selected **primary verified wallet** for the Wallet Reputation dimension. Changing the primary wallet must:
+The current alpha adapter accepts an `ownershipVerified` assertion only through the privileged `adapter:solana` path. This is an internal trust boundary, not a public self-attestation mechanism. Production integration should bind that assertion to GwapOS wallet-auth/proof evidence.
 
-- require proof of control;
-- preserve provenance/history of the prior linkage;
-- trigger recalculation;
-- be visible in score explanation metadata.
-
-This avoids silently cherry-picking or mixing unrelated wallets. Multi-wallet aggregation requires a separate versioned policy.
+Initial v2 policy should use one explicitly selected primary verified wallet for Wallet Reputation. Multi-wallet aggregation requires a separate versioned policy.
 
 ## Contradictory evidence
 
@@ -336,7 +345,7 @@ Confidence: 85%
 
 ## Explainability contract
 
-Every v2 result should expose at least:
+The implemented alpha output includes:
 
 ```ts
 {
@@ -344,24 +353,30 @@ Every v2 result should expose at least:
   status,
   score,
   tier,
-  dimensions,
+  composite100,
   coverage,
   confidence,
-  effectiveWeights,
-  positiveDrivers,
-  negativeDrivers,
-  unavailableEvidence,
-  provenance,
-  calculatedAt
+  dimensions,
+  unavailableEvidence
 }
 ```
 
-The engine must be able to explain which evidence materially changed the result.
+Each observed dimension includes provenance and an explanation. The API does not expose secrets, access tokens, or unnecessary raw wallet history.
+
+## Executable implementation
+
+- `gwap-score-full/reputation/composite.ts` — deterministic composite engine.
+- `gwap-score-full/reputation/walletIntelligence.ts` — privileged wallet-evidence persistence and normalization.
+- `gwap-score-full/reputation/service.ts` — social + wallet + identity evidence composition.
+- `gwap-score-full/api/routes/reputation.ts` — authenticated v2 score surface.
+- `GET /v1/reputation/me` — returns the authenticated user's v2 result.
+- `POST /v1/adapters/solana/evidence` — privileged wallet evidence ingestion; `ownershipVerified` defaults to false.
 
 ## Privacy and consent
 
 - Social data collection remains consented and source-scoped.
-- Wallet linkage requires proof of control.
+- Wallet linkage requires verified control before reputation contribution.
+- The v2 endpoint is authenticated and self-scoped through the API key's `user_id`.
 - Public score presentation must not expose private tokens, secrets, private messages, or unnecessary raw wallet history.
 - B2B surfaces should return only the evidence detail authorized by their contract.
 
@@ -369,7 +384,7 @@ The engine must be able to explain which evidence materially changed the result.
 
 ### `social/scoring.ts`
 
-The current social scorer is useful implementation evidence, but its `neutralIfMissing(...)=50` behavior is not compatible with the final v2 evidence-state contract. Do not wire it directly into final v2 aggregation without an evidence-aware migration.
+The social scorer has now been migrated away from neutral missing-data imputation. Missing/non-finite metrics are excluded, factor confidence is explicit, and historical pre-migration rows require re-ingestion before v2 use.
 
 ### `protocol/scoring.v1.ts`
 
@@ -377,19 +392,18 @@ The older protocol scorer contains reusable concepts such as wallet ownership, w
 
 ### Solana adapter
 
-The existing Solana adapter may be evolved into a Wallet Reputation evidence adapter after validating provenance and replacing threshold-only point logic with the v2 wallet-evidence contract.
+The existing adapter retains its legacy claim writes for compatibility and additionally writes a dedicated Wallet Intelligence snapshot. Only the dedicated snapshot is eligible for the v2 wallet dimension.
 
-## Implementation gates
+## Remaining production gates
 
 Before v2 becomes production scoring:
 
-1. define the Wallet Intelligence evidence contract;
-2. migrate social scoring to explicit unavailable/observed metrics;
-3. implement composite scoring as a pure deterministic function;
-4. add golden regression fixtures;
-5. test contradictory and missing-evidence cases;
-6. test wallet-link proof and wallet-switch behavior;
-7. validate score distributions against real snapshot data;
-8. document model version and rollout/rollback;
-9. expose dimensions/coverage/confidence in API contracts;
-10. explicitly approve production activation.
+1. complete full CI and database/security regression validation;
+2. bind `ownershipVerified` to authoritative GwapOS wallet proof rather than adapter assertion alone;
+3. test wallet-switch and primary-wallet policy;
+4. validate score distributions against representative real social/wallet data;
+5. calibrate dimension and wallet submodel weights;
+6. connect trusted PPV/GWAP ecosystem evidence where intended;
+7. test Sybil/gaming and contradictory-evidence cases;
+8. document rollout/rollback and model-version promotion;
+9. explicitly approve production activation.
