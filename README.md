@@ -43,7 +43,9 @@ Trusted Solana adapter callers can continue submitting wallet evidence at:
 
 `POST /v1/adapters/solana/evidence`
 
-The wallet payload now accepts optional `ownershipVerified: true|false`. Only dedicated Wallet Intelligence snapshots with verified control can affect the v2 wallet dimension. Existing legacy claims remain for backwards compatibility but are not authoritative v2 wallet-score inputs.
+The wallet payload accepts optional `ownershipVerified: true|false`. Only dedicated Wallet Intelligence snapshots with verified control can affect the v2 wallet dimension. Existing legacy claims remain for backwards compatibility but are not authoritative v2 wallet-score inputs.
+
+`ownershipVerified` is currently an assertion accepted only through the privileged `adapter:solana` trust boundary. Before production activation it must be bound to authoritative GwapOS wallet-auth/proof evidence rather than treated as a public self-attestation mechanism.
 
 ## Contents
 
@@ -63,10 +65,12 @@ Older protocol code that scores Solana wallet claims is retained as implementati
 The v2 implementation is **alpha and not yet authorized as the production scoring model**. Production activation requires:
 
 1. successful full CI and regression tests;
-2. real-data distribution analysis;
-3. calibration of dimension and wallet submodel weights;
-4. trusted PPV/GWAP ecosystem evidence integration where applicable;
-5. explicit model-version promotion and Founder approval.
+2. authoritative wallet-control proof binding;
+3. real-data distribution analysis;
+4. calibration of dimension and wallet submodel weights;
+5. trusted PPV/GWAP ecosystem evidence integration where applicable;
+6. adversarial/Sybil and wallet-switch testing;
+7. explicit model-version promotion and Founder approval.
 
 ## Requirements
 
