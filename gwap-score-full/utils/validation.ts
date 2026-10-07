@@ -67,12 +67,15 @@ export const telegramIdSchema = Joi.string()
   .max(20)
   .required();
 
-// Solana evidence validation
+// Solana evidence validation. ownershipVerified is asserted only by the
+// privileged adapter caller; generic profile claims never receive v2 wallet
+// reputation authority.
 export const solanaEvidenceSchema = Joi.object({
   subjectId: subjectIdSchema,
   walletAddress: solanaWalletSchema,
   walletAgeDays: Joi.number().integer().min(0).max(10000).required(),
   txCount: Joi.number().integer().min(0).max(1000000000).required(),
+  ownershipVerified: Joi.boolean().default(false),
 });
 
 // Telegram verification validation
