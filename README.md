@@ -16,30 +16,57 @@ The Founder-approved composite-reputation direction is recorded there as `GWAP-R
 
 ## Current model direction
 
-The v2 model preserves the public **300–900 GwapScore** contract while exposing the evidence behind the number.
+The v2 alpha model preserves the public **300–900 GwapScore** contract while exposing the evidence behind the number.
 
-Planned dimensions:
+Current dimensions:
 
-- **Social reputation** — verified social ownership, authenticity, engagement quality, consistency, audience trust, longitudinal behavior.
-- **Wallet reputation** — reputation-eligible Wallet Intelligence such as verified wallet control, longevity, transaction history, protocol participation, and behavioral continuity.
-- **Identity / proof** — verified identity relationships and proof-of-control evidence.
-- **GWAP ecosystem reputation** — verified PPV/GWAP activity and other explicitly approved ecosystem facts.
+- **Social reputation** — verified social ownership plus observed authenticity, engagement quality, consistency, audience trust, and related social evidence. Missing metrics are excluded rather than converted to an invented neutral value.
+- **Wallet reputation** — privileged Wallet Intelligence snapshots derived from verified wallet control, wallet longevity, and transaction activity. Generic profile claims are not eligible to self-award this dimension.
+- **Identity / proof** — current alpha support measures verified social OAuth control and verified wallet control as separate proof classes.
+- **GWAP ecosystem reputation** — reserved for trusted PPV/GWAP evidence; currently unavailable until those adapters are connected.
 
-The score must also expose evidence coverage, confidence, provenance, and explanations. Missing evidence is not scored as zero and must not be silently imputed as bad reputation.
+The score exposes evidence coverage, confidence, provenance, per-dimension explanations, model version, and whether the result is `unscored`, `provisional`, or fully `scored`.
+
+Missing evidence is not scored as zero. Historical social rows created under the older neutral-imputation model do not enter v2 until the social account is re-ingested under the new evidence-state contract.
 
 Wallet Exposure Risk is excluded from the GwapScore reputation calculation. Portfolio concentration, volatility, token-risk exposure, and similar financial-risk signals remain separate even when returned beside GwapScore by a broader intelligence API.
 
 See [`GWAPSCORE_REPUTATION_MODEL_V2.md`](GWAPSCORE_REPUTATION_MODEL_V2.md).
 
+## v2 alpha API
+
+Authenticated user-scoped API keys can retrieve their composite score at:
+
+`GET /v1/reputation/me`
+
+Trusted Solana adapter callers can continue submitting wallet evidence at:
+
+`POST /v1/adapters/solana/evidence`
+
+The wallet payload now accepts optional `ownershipVerified: true|false`. Only dedicated Wallet Intelligence snapshots with verified control can affect the v2 wallet dimension. Existing legacy claims remain for backwards compatibility but are not authoritative v2 wallet-score inputs.
+
 ## Contents
 
 - `gwap-score-full/` — Full implementation and source
+- `gwap-score-full/reputation/composite.ts` — Pure v2 composite scoring engine
+- `gwap-score-full/reputation/walletIntelligence.ts` — Wallet Intelligence evidence normalization
+- `gwap-score-full/reputation/service.ts` — Evidence composition service
 - `gwapscore-docs-publish/` — Generated documentation ready for publishing
 - `gwapscore-github-ready/` — Built artifacts prepared for GitHub release
 - `assets/` — Project assets (images, icons, etc.)
-- [`gwap-score-full/README.md`](gwap-score-full/README.md) — Backend setup and current social reputation API
+- [`gwap-score-full/README.md`](gwap-score-full/README.md) — Backend setup and social reputation API
 
-Older protocol code that scores Solana wallet claims is retained as implementation/history evidence. It is not the v2 production scoring contract and must not be re-enabled wholesale. Reusable wallet facts should flow through the v2 Wallet Reputation dimension under the current evidence rules.
+Older protocol code that scores Solana wallet claims is retained as implementation/history evidence. It is not the v2 production scoring contract and must not be re-enabled wholesale.
+
+## Production gate
+
+The v2 implementation is **alpha and not yet authorized as the production scoring model**. Production activation requires:
+
+1. successful full CI and regression tests;
+2. real-data distribution analysis;
+3. calibration of dimension and wallet submodel weights;
+4. trusted PPV/GWAP ecosystem evidence integration where applicable;
+5. explicit model-version promotion and Founder approval.
 
 ## Requirements
 
