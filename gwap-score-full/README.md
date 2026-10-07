@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="../assets/brand/logo.png" alt="GwapScore Logo" width="200" />
+  <img src="../assets/brand/logo.svg" alt="GwapScore" width="220" />
 </p>
 
 # GwapScore Trust Protocol v1.0

@@ -1,51 +1,50 @@
-# GwapScore Brand Assets
+<p align="center">
+  <img src="banner.png" alt="GwapScore" width="100%" />
+</p>
 
-This directory contains official brand assets for GwapScore.
+# GwapScore Brand Kit
 
-## Logo
+Official GwapScore emblem system — **Option 1A / Scoreboard Crest**.
 
-The official GwapScore logo features a vibrant green pinching hand gesture, symbolizing precision and value assessment.
+## Colors
 
-### Logo File
+| Token | Hex | Use |
+| --- | --- | --- |
+| GwapScore Green | `#13DD13` | Emblem, primary accents, links, highlights |
+| Black | `#000000` | Primary background |
+| White | `#FFFFFF` | Wordmark and body text on black |
 
-Place the official logo file here:
-- **File**: `logo.png`
-- **Format**: PNG with transparency
-- **Color**: Bright green (#00FF00 or similar)
-- **Recommended Size**: At least 512x512px for optimal quality
+## Files
 
-### Additional Formats
+| File | Use |
+| --- | --- |
+| [`logo.svg`](logo.svg) | Default logo (same as the primary crest) |
+| [`logo.png`](logo.png) | Default raster logo, 512px, transparent |
+| [`svg/GwapScore_Scoreboard_Crest_Primary.svg`](svg/GwapScore_Scoreboard_Crest_Primary.svg) | Master emblem |
+| [`svg/GwapScore_Scoreboard_Crest_CurrentColor.svg`](svg/GwapScore_Scoreboard_Crest_CurrentColor.svg) | Inherits CSS `currentColor` for themed UI |
+| [`svg/GwapScore_GS_Micro_Mark.svg`](svg/GwapScore_GS_Micro_Mark.svg) | Reduced GS mark for tiny UI and favicons |
+| [`png/`](png/) | Transparent crest exports, 32–2048px wide |
+| [`favicon/`](favicon/) | GS micro-mark exports, 16–512px wide |
+| [`favicon.ico`](favicon.ico) | Square multi-size favicon (16/32/48) |
+| [`app-icon-512.png`](app-icon-512.png) | Square app icon on black (PWA, app stores, avatars) |
+| [`banner.png`](banner.png) | README / documentation header |
+| [`social-preview.png`](social-preview.png) | 1280×640 GitHub social preview and link cards |
 
-For different use cases, you may also want to include:
-- `logo.svg` - Vector format for scalability
-- `logo-white.png` - White version for dark backgrounds
-- `favicon.ico` - Favicon for web applications
-- `logo-small.png` - Smaller version for icons (32x32, 64x64, 128x128)
+## Usage
 
-## Brand Guidelines
+- Use the full crowned scoreboard crest at normal display sizes.
+- Switch to the GS Micro Mark when the full enclosure becomes too small to reproduce cleanly (roughly under 48px wide).
+- Keep clear space around the emblem equal to at least one side-tick width.
+- Prefer the black background; the green crest is designed for dark surfaces.
 
-For complete brand usage guidelines, see:
-- [Brand Documentation](../../gwapscore-docs-publish/overview/brand.mdx)
+**Do not** stretch, rotate, recolor, rearrange, add effects to, or replace the custom segmented GS.
 
-## Quick Reference
+## Copies elsewhere in the repo
 
-**Brand Colors:**
-- Primary Green: `#00FF00` or similar bright green
-- Use on light backgrounds for optimal visibility
+Keep these in sync with this directory when the brand changes:
 
-**Usage:**
-- Always maintain aspect ratio
-- Ensure adequate clear space
-- Do not modify colors or distort
-- Use official files only
+- `gwapscore-docs-publish/logo.svg`, `logo.png`, `favicon.ico`
+- `gwap-score-full/assets/brand/logo.svg`, `logo.png`
+- `gwapscore-github-ready/assets/brand/logo.svg`, `logo.png`
 
-## File Locations
-
-This logo should be copied to:
-1. `/assets/brand/logo.png` (this location - main brand assets)
-2. `/gwapscore-docs-publish/logo.png` (documentation site)
-3. `/gwap-score-full/assets/brand/logo.png` (application assets)
-
-## Contact
-
-For brand inquiries or licensing questions, please contact the GwapScore team.
+See also the [brand documentation page](../../gwapscore-docs-publish/overview/brand.mdx).
