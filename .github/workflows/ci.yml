@@ -71,7 +71,7 @@ jobs:
         run: |
           psql -h localhost -U test_user -d gwapscore_test -f database/schema.sql
 
-      - name: Run tests
+      - name: Run tests and v2 scoring coverage gate
         working-directory: gwap-score-full
         env:
           NODE_ENV: test
@@ -81,14 +81,14 @@ jobs:
           DB_USER: test_user
           DB_PASSWORD: test_password
           JWT_SECRET: test_secret_for_ci
-        run: npm test -- --coverage
+        run: npm test -- --coverage --config jest.v2-coverage.config.js
 
       - name: Upload coverage reports
         uses: codecov/codecov-action@v3
         with:
           files: gwap-score-full/coverage/coverage-final.json
-          flags: unittests
-          name: codecov-umbrella
+          flags: gwapscore-v2
+          name: gwapscore-v2-critical
 
   build:
     name: Build TypeScript
