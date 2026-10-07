@@ -1,0 +1,1 @@
+See [`../SECURITY_DEPENDENCY_REMEDIATION.md`](../SECURITY_DEPENDENCY_REMEDIATION.md) for the current dependency-audit remediation gate. This pointer exists so future security documentation can live under `docs/` without duplicating the audit evidence or remediation policy.
