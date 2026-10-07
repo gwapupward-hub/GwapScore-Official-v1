@@ -1,4 +1,5 @@
 import { appendClaim } from '../../core-engine/src/engine.js';
+import { query } from '../../database/client.js';
 import { validate, solanaEvidenceSchema } from '../../utils/validation.js';
 import { logger } from '../../utils/logger.js';
 import { saveWalletIntelligenceSnapshot } from '../../reputation/walletIntelligence.js';
@@ -9,6 +10,22 @@ export interface SolanaEvidence {
   walletAgeDays: number;
   txCount: number;
   ownershipVerified?: boolean;
+}
+
+/**
+ * Ensure a first-time verified wallet can enter the reputation pipeline without
+ * requiring the caller to hold the broader profile:create permission.
+ *
+ * The privileged adapter still controls which evidence can be submitted; this
+ * only provisions the append-only subject row required by claims/snapshots.
+ */
+async function ensureWalletEvidenceSubject(subjectId: string): Promise<void> {
+  await query(
+    `INSERT INTO trust_profiles (subject_id)
+     VALUES ($1)
+     ON CONFLICT (subject_id) DO NOTHING`,
+    [subjectId]
+  );
 }
 
 /**
@@ -26,6 +43,8 @@ export async function submitSolanaEvidence(evidence: SolanaEvidence): Promise<vo
     solanaEvidenceSchema,
     evidence
   );
+
+  await ensureWalletEvidenceSubject(validatedEvidence.subjectId);
 
   const issuedAt = new Date().toISOString();
 
