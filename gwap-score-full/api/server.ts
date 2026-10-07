@@ -10,6 +10,7 @@ import profilesRouter from './routes/profiles.js';
 import adaptersRouter from './routes/adapters.js';
 import systemRouter from './routes/system.js';
 import socialRouter from './routes/social.js';
+import reputationRouter from './routes/reputation.js';
 
 // Load environment variables
 dotenv.config();
@@ -51,6 +52,7 @@ app.use('/v1/profiles', profilesRouter);
 app.use('/v1/adapters', adaptersRouter);
 app.use('/v1/system', systemRouter);
 app.use('/v1/social', socialRouter);
+app.use('/v1/reputation', reputationRouter);
 
 // Root endpoint
 app.get('/', (_req, res) => {
@@ -59,6 +61,7 @@ app.get('/', (_req, res) => {
     version: '1.0.0',
     documentation: '/v1/system/scoring-algorithm',
     health: '/v1/system/health',
+    reputation: '/v1/reputation/me',
   });
 });
 

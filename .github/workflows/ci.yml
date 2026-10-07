@@ -71,7 +71,7 @@ jobs:
         run: |
           psql -h localhost -U test_user -d gwapscore_test -f database/schema.sql
 
-      - name: Run tests
+      - name: Run tests and v2 scoring coverage gate
         working-directory: gwap-score-full
         env:
           NODE_ENV: test
@@ -81,14 +81,14 @@ jobs:
           DB_USER: test_user
           DB_PASSWORD: test_password
           JWT_SECRET: test_secret_for_ci
-        run: npm test -- --coverage
+        run: npm test -- --coverage --config jest.v2-coverage.config.js
 
       - name: Upload coverage reports
         uses: codecov/codecov-action@v3
         with:
           files: gwap-score-full/coverage/coverage-final.json
-          flags: unittests
-          name: codecov-umbrella
+          flags: gwapscore-v2
+          name: gwapscore-v2-critical
 
   build:
     name: Build TypeScript
@@ -142,6 +142,10 @@ jobs:
   security:
     name: Security Scan
     runs-on: ubuntu-latest
+    permissions:
+      actions: read
+      contents: read
+      security-events: write
 
     steps:
       - name: Checkout code
@@ -165,8 +169,36 @@ jobs:
           format: 'sarif'
           output: 'trivy-results.sarif'
 
+      - name: Preserve Trivy SARIF evidence
+        uses: actions/upload-artifact@v4
+        with:
+          name: trivy-sarif-${{ github.sha }}
+          path: trivy-results.sarif
+          if-no-files-found: error
+          retention-days: 14
+
+      - name: Detect GitHub code scanning availability
+        id: code-scanning
+        shell: bash
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          status="$(curl -sS -o /dev/null -w '%{http_code}' \
+            -H "Accept: application/vnd.github+json" \
+            -H "Authorization: Bearer ${GH_TOKEN}" \
+            -H "X-GitHub-Api-Version: 2022-11-28" \
+            "https://api.github.com/repos/${GITHUB_REPOSITORY}/code-scanning/alerts?per_page=1")"
+          if [ "$status" = "200" ]; then
+            echo "enabled=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "enabled=false" >> "$GITHUB_OUTPUT"
+            echo "::warning::GitHub code scanning is unavailable for this repository (HTTP ${status}); Trivy SARIF was preserved as a workflow artifact instead."
+          fi
+
       - name: Upload Trivy results to GitHub Security
-        uses: github/codeql-action/upload-sarif@v2
+        if: steps.code-scanning.outputs.enabled == 'true'
+        uses: github/codeql-action/upload-sarif@v4
         with:
           sarif_file: 'trivy-results.sarif'
 
