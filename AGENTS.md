@@ -1,10 +1,11 @@
 # AGENTS.md
 
-Before changing GwapScore product behavior, read `GWAP-MASTER.md` and `GWAPSCORE_REPUTATION_MODEL_V2.md`.
+Before changing GwapScore product behavior, read `GWAP-MASTER.md`, `GWAPSCORE_V2_FOUNDATION_FREEZE.md`, and `GWAPSCORE_REPUTATION_MODEL_V2.md`.
 
 ## Authority
 
 - Explicit Founder/current product decisions define GwapScore's scope.
+- `GWAPSCORE_V2_FOUNDATION_FREEZE.md` is the frozen v2 architectural baseline.
 - Repo-local code/tests define current implementation reality.
 - GWAP MASTER defines cross-system ownership boundaries.
 - External examples or older scoring models do not silently expand GwapScore's scope.
@@ -39,6 +40,13 @@ Older Solana scoring code in this repository is historical implementation eviden
 - The current `ownershipVerified` adapter assertion is an alpha trust boundary and must be bound to authoritative wallet proof before production activation.
 - Historical social rows created under neutral-imputation scoring require re-ingestion before entering v2.
 - GwapScore must never consume another GwapScore value as an input to itself.
+- Published v2 tier language must describe reputation, not imply a credit or portfolio-risk determination.
+
+## Frozen-vs-calibration rule
+
+Do not reopen a frozen v2 architectural rule merely to tune model quality. Calibration work may change candidate weights, activity anchors, confidence policies, and promotion thresholds only with regression evidence, distribution analysis, documented rationale, and model-version review.
+
+A proposed change to a frozen rule must explicitly identify the affected freeze clause and provide migration and rollback impact.
 
 ## Change rule
 
