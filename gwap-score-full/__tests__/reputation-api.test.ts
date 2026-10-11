@@ -37,7 +37,7 @@ function testApp(service: ReputationService, withUser = true): express.Express {
 describe('GwapScore v2 API', () => {
   test('returns only the authenticated user composite reputation', async () => {
     const score = {
-      modelVersion: '2.0.0-alpha.1',
+      modelVersion: '2.0.0-alpha.2',
       status: 'provisional',
       score: 712,
       tier: 'Strong',

@@ -113,8 +113,8 @@ describe('GwapScore v2 composite reputation', () => {
     })).toThrow(RangeError);
   });
 
-  test('preserves the public 300-900 tier contract', () => {
-    expect(mapGwapScoreV2Tier(300)).toBe('High Risk');
+  test('preserves the public 300-900 tier contract without financial-risk language', () => {
+    expect(mapGwapScoreV2Tier(300)).toBe('Emerging');
     expect(mapGwapScoreV2Tier(500)).toBe('Developing');
     expect(mapGwapScoreV2Tier(600)).toBe('Established');
     expect(mapGwapScoreV2Tier(700)).toBe('Strong');

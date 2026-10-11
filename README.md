@@ -4,13 +4,15 @@
 
 <p align="center">
   <a href="https://github.com/gwapupward-hub/gwapscore-official-v1/actions/workflows/ci.yml"><img src="https://github.com/gwapupward-hub/gwapscore-official-v1/actions/workflows/ci.yml/badge.svg" alt="CI" /></a>
-  <img src="https://img.shields.io/badge/model-v2%20alpha-13DD13?labelColor=000000" alt="Model: v2 alpha" />
+  <img src="https://img.shields.io/badge/model-v2%20alpha.2-13DD13?labelColor=000000" alt="Model: v2 alpha.2" />
+  <img src="https://img.shields.io/badge/foundation-frozen-13DD13?labelColor=000000" alt="Foundation: frozen" />
   <img src="https://img.shields.io/badge/score-300%E2%80%93900-13DD13?labelColor=000000" alt="Score range: 300-900" />
   <img src="https://img.shields.io/badge/TypeScript-5.x-13DD13?labelColor=000000&logo=typescript&logoColor=white" alt="TypeScript" />
   <a href="LICENSE"><img src="https://img.shields.io/badge/license-MIT-13DD13?labelColor=000000" alt="License: MIT" /></a>
 </p>
 
 <p align="center">
+  <a href="GWAPSCORE_V2_FOUNDATION_FREEZE.md">Foundation Freeze</a> ·
   <a href="GWAPSCORE_REPUTATION_MODEL_V2.md">Reputation Model</a> ·
   <a href="GWAP-MASTER.md">GWAP Master</a> ·
   <a href="gwap-score-full/README.md">Backend</a> ·
@@ -23,6 +25,14 @@
 **GwapScore** is a **social-reputation-first, multidimensional reputation system**. This repository is the canonical TypeScript implementation.
 
 Social proof-of-control and longitudinal social evidence remain the primary product surface, while reputation-eligible Wallet Intelligence may contribute supporting evidence to the overall GwapScore. Wallet portfolio exposure risk remains a separate product signal and is not reputation.
+
+## Foundation status
+
+The v2 architecture is now frozen under [`GWAPSCORE-V2-FREEZE-001`](GWAPSCORE_V2_FOUNDATION_FREEZE.md). The freeze locks the product definition, 300–900 public range, four reputation dimensions, explicit evidence states, coverage/confidence semantics, explainability, deterministic composition, Wallet Intelligence boundary, Proof-of-Control requirement, anti-circularity, and model-version change discipline.
+
+Calibration is still open. The current dimension weights and wallet submodel parameters are candidates that must be validated against representative data before production promotion.
+
+The active candidate model version is **`2.0.0-alpha.2`**. It is not yet authorized as production scoring.
 
 ## Cross-system authority
 
@@ -71,7 +81,9 @@ The wallet payload accepts optional `ownershipVerified: true|false`. Only dedica
 
 | Path | Description |
 | --- | --- |
-| [`gwap-score-full/`](gwap-score-full/) | Full implementation and source — see its [README](gwap-score-full/README.md) for backend setup and the social reputation API |
+| [`GWAPSCORE_V2_FOUNDATION_FREEZE.md`](GWAPSCORE_V2_FOUNDATION_FREEZE.md) | Frozen v2 architectural contract and change-control baseline |
+| [`GWAPSCORE_REPUTATION_MODEL_V2.md`](GWAPSCORE_REPUTATION_MODEL_V2.md) | Canonical v2 model specification |
+| [`gwap-score-full/`](gwap-score-full/) | Full implementation and source — see its [README](gwap-score-full/README.md) for backend setup and legacy implementation notes |
 | `gwap-score-full/reputation/composite.ts` | Pure v2 composite scoring engine |
 | `gwap-score-full/reputation/walletIntelligence.ts` | Wallet Intelligence evidence normalization |
 | `gwap-score-full/reputation/service.ts` | Evidence composition service |
@@ -80,6 +92,18 @@ The wallet payload accepts optional `ownershipVerified: true|false`. Only dedica
 | [`assets/brand/`](assets/brand/) | Official brand kit — logos, favicons, social preview |
 
 Older protocol code that scores Solana wallet claims is retained as implementation/history evidence. It is not the v2 production scoring contract and must not be re-enabled wholesale.
+
+## Current v2 tiers
+
+| Score | Tier |
+| ---: | --- |
+| 300–499 | Emerging |
+| 500–599 | Developing |
+| 600–699 | Established |
+| 700–799 | Strong |
+| 800–900 | Elite |
+
+The old `High Risk` label is retired from the v2 reputation model to avoid implying a credit or financial-risk determination.
 
 ## Production gate
 
@@ -91,7 +115,12 @@ The v2 implementation is **alpha and not yet authorized as the production scorin
 4. calibration of dimension and wallet submodel weights;
 5. trusted PPV/GWAP ecosystem evidence integration where applicable;
 6. adversarial/Sybil and wallet-switch testing;
-7. explicit model-version promotion and Founder approval.
+7. explanation/reason-code validation;
+8. explicit model-version promotion and Founder approval.
+
+## Next implementation milestone
+
+The next engineering milestone is **Authoritative Wallet Proof-of-Control** through GwapOS: issue a short-lived challenge, have the wallet sign it, verify the signature/nonce/subject/expiry server-side, persist the proof, and only then make Wallet Intelligence reputation-eligible.
 
 ## Requirements
 
@@ -112,7 +141,7 @@ For the full backend implementation, run the corresponding commands from `gwap-s
 
 ## Contributing
 
-Please open issues or pull requests. Read `AGENTS.md` and `GWAP-MASTER.md` before changing scoring behavior or evidence ownership.
+Please open issues or pull requests. Read `AGENTS.md`, `GWAP-MASTER.md`, and `GWAPSCORE_V2_FOUNDATION_FREEZE.md` before changing scoring behavior or evidence ownership.
 
 ## License
 
