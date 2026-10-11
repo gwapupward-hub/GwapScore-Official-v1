@@ -1,4 +1,4 @@
-export const GWAPSCORE_V2_MODEL_VERSION = '2.0.0-alpha.1' as const;
+export const GWAPSCORE_V2_MODEL_VERSION = '2.0.0-alpha.2' as const;
 
 export const GWAPSCORE_V2_DIMENSION_WEIGHTS = {
   social: 45,
@@ -9,7 +9,7 @@ export const GWAPSCORE_V2_DIMENSION_WEIGHTS = {
 
 export type ReputationDimension = keyof typeof GWAPSCORE_V2_DIMENSION_WEIGHTS;
 export type GwapScoreV2Status = 'unscored' | 'provisional' | 'scored';
-export type GwapScoreV2Tier = 'High Risk' | 'Developing' | 'Established' | 'Strong' | 'Elite';
+export type GwapScoreV2Tier = 'Emerging' | 'Developing' | 'Established' | 'Strong' | 'Elite';
 
 export type ObservedDimension = {
   state: 'observed';
@@ -80,7 +80,7 @@ export function mapGwapScoreV2Tier(score: number): GwapScoreV2Tier {
   if (score >= 700) return 'Strong';
   if (score >= 600) return 'Established';
   if (score >= 500) return 'Developing';
-  return 'High Risk';
+  return 'Emerging';
 }
 
 /**
