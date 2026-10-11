@@ -1,10 +1,11 @@
 # GwapScore Reputation Model v2
 
-**Status:** IMPLEMENTATION PILOT  
+**Status:** FOUNDATION FROZEN — IMPLEMENTATION PILOT  
 **Model family:** GwapScore v2  
-**Candidate model version:** `2.0.0-alpha.1`  
+**Candidate model version:** `2.0.0-alpha.2`  
 **Public score range:** 300–900  
-**Authority:** Founder decision `GWAP-REPUTATION-001` + GWAP MASTER
+**Authority:** Founder decision `GWAP-REPUTATION-001` + GWAP MASTER  
+**Foundation freeze:** [`GWAPSCORE-V2-FREEZE-001`](GWAPSCORE_V2_FOUNDATION_FREEZE.md)
 
 ## Product definition
 
@@ -32,7 +33,7 @@ GWAP Ecosystem   Unavailable
 
 Coverage         90%
 Confidence       85%
-Model            2.0.0-alpha.1
+Model            2.0.0-alpha.2
 ```
 
 The number is a summary. The dimensional reputation profile is the product truth.
@@ -128,7 +129,7 @@ It is currently returned as unavailable by the executable alpha composition serv
 | Identity / Proof | 15% |
 | GWAP Ecosystem Reputation | 10% |
 
-These are **candidate calibration weights**, not permanent architecture law.
+These are **candidate calibration weights**, not permanent architecture law. The v2 foundation freeze locks the dimensions and composition boundaries, not these final production percentages.
 
 Any production weight change must:
 
@@ -211,21 +212,21 @@ Candidate v2 policy:
 
 This prevents one evidence source from silently becoming the entire reputation system while still allowing a user to see a provisional result during onboarding.
 
-The threshold is versioned model policy and may be calibrated before production.
+The threshold is versioned model policy and remains calibration-eligible before production.
 
 ## Tiers
 
-The current public 300–900 contract is preserved:
+The public 300–900 numeric contract is preserved while using reputation-oriented labels:
 
 | Score | Tier |
 | ---: | --- |
-| 300–499 | High Risk |
+| 300–499 | Emerging |
 | 500–599 | Developing |
 | 600–699 | Established |
 | 700–799 | Strong |
 | 800–900 | Elite |
 
-Tier names may be reviewed separately from the numeric contract. A tier label must not imply a financial-credit determination.
+`High Risk` is retired from v2 tier vocabulary because it can imply a financial-credit or portfolio-risk determination that GwapScore does not make.
 
 ## Wallet Intelligence boundary
 
@@ -269,7 +270,7 @@ These may appear beside GwapScore in an intelligence product, but they do not be
 
 A wallet must be proven as controlled by the score subject before it contributes.
 
-The current alpha adapter accepts an `ownershipVerified` assertion only through the privileged `adapter:solana` path. This is an internal trust boundary, not a public self-attestation mechanism. Production integration should bind that assertion to GwapOS wallet-auth/proof evidence.
+The current alpha adapter accepts an `ownershipVerified` assertion only through the privileged `adapter:solana` path. This is an internal trust boundary, not a public self-attestation mechanism. Production integration must bind that assertion to authoritative GwapOS wallet-auth/proof evidence.
 
 Initial v2 policy should use one explicitly selected primary verified wallet for Wallet Reputation. Multi-wallet aggregation requires a separate versioned policy.
 
@@ -405,5 +406,6 @@ Before v2 becomes production scoring:
 5. calibrate dimension and wallet submodel weights;
 6. connect trusted PPV/GWAP ecosystem evidence where intended;
 7. test Sybil/gaming and contradictory-evidence cases;
-8. document rollout/rollback and model-version promotion;
-9. explicitly approve production activation.
+8. validate user-facing explanation/reason-code behavior;
+9. document rollout/rollback and model-version promotion;
+10. explicitly approve production activation.
