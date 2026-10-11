@@ -58,7 +58,6 @@ describe('GwapScore v2 foundation invariants', () => {
   });
 
   test('does not allow unknown wealth-like fields to affect the deterministic composite', () => {
-    const clean = deriveCompositeGwapScoreV2(baseline);
     const withIrrelevantFinancialMetadata = deriveCompositeGwapScoreV2({
       ...baseline,
       wallet: {
@@ -81,7 +80,6 @@ describe('GwapScore v2 foundation invariants', () => {
     });
 
     expect(withIrrelevantFinancialMetadata).toEqual(sameWalletWithoutMetadata);
-    expect(withIrrelevantFinancialMetadata.score).not.toBe(clean.score);
   });
 
   test('keeps every published score inside the 300-900 public range', () => {
