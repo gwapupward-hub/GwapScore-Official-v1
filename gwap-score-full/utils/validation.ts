@@ -1,4 +1,5 @@
 import Joi from 'joi';
+import bs58 from 'bs58';
 import { ValidationError } from './errors.js';
 
 // Subject ID validation (wallet address, telegram ID, etc.)
@@ -56,8 +57,17 @@ export const attestationSchema = Joi.object({
 
 // Solana wallet validation
 export const solanaWalletSchema = Joi.string()
-  .length(44)
-  .pattern(/^[1-9A-HJ-NP-Za-km-z]{44}$/)
+  .min(32)
+  .max(44)
+  .pattern(/^[1-9A-HJ-NP-Za-km-z]+$/)
+  .custom((address: string, helpers) => {
+    try {
+      // Base58 text length varies; Solana public keys are always 32 bytes.
+      return bs58.decode(address).length === 32 ? address : helpers.error('any.invalid');
+    } catch {
+      return helpers.error('any.invalid');
+    }
+  }, '32-byte Solana public key')
   .required();
 
 // Telegram ID validation

@@ -1,7 +1,52 @@
-import { validate, claimSchema, eventSchema, attestationSchema } from '../utils/validation.js';
+import bs58 from 'bs58';
+import { validate, claimSchema, eventSchema, attestationSchema, solanaWalletSchema, solanaEvidenceSchema } from '../utils/validation.js';
 import { ValidationError } from '../utils/errors.js';
 
 describe('Validation', () => {
+  describe('Solana Public Key Validation', () => {
+    const shortPublicKey = bs58.encode(Buffer.alloc(32));
+    const normalPublicKey = bs58.encode(Buffer.alloc(32, 1));
+    const longPublicKey = bs58.encode(Buffer.alloc(32, 255));
+
+    test('accepts Solana keys of different base58 lengths when they decode to 32 bytes', () => {
+      expect(shortPublicKey).toHaveLength(32);
+      expect(normalPublicKey.length).toBeGreaterThan(32);
+      expect(normalPublicKey.length).toBeLessThanOrEqual(44);
+      expect(longPublicKey).toHaveLength(44);
+      for (const address of [shortPublicKey, normalPublicKey, longPublicKey]) {
+        expect(validate<string>(solanaWalletSchema, address)).toBe(address);
+      }
+    });
+
+    test('accepts a 32-character verified wallet in the adapter payload', () => {
+      const payload = {
+        subjectId: 'gwap_account_123',
+        walletAddress: shortPublicKey,
+        walletAgeDays: 25,
+        txCount: 10,
+        ownershipVerified: true,
+      };
+      expect(() => validate(solanaEvidenceSchema, payload)).not.toThrow();
+    });
+
+    test('rejects invalid base58, wrong decoded byte size, and non-string addresses', () => {
+      const invalid = [
+        '',
+        '0'.repeat(44),
+        'O'.repeat(44),
+        '1'.repeat(31),
+        '1'.repeat(33),
+        '1'.repeat(44),
+        bs58.encode(Buffer.alloc(31, 1)),
+        bs58.encode(Buffer.alloc(33, 1)),
+        123,
+      ];
+      for (const address of invalid) {
+        expect(() => validate(solanaWalletSchema, address)).toThrow(ValidationError);
+      }
+    });
+  });
+
   describe('Claim Validation', () => {
     test('should validate correct claim', () => {
       const claim = {
